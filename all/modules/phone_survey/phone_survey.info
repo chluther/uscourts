@@ -1,0 +1,6 @@
+; $Id$
+name = "Phone Survey"
+description = "Ask our customers about their phones"
+package = "ABC Corp."
+core = 7.x
+version = 1.1

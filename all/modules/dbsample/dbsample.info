@@ -1,0 +1,5 @@
+name = Database Example
+description = An example module showing how use the database API.
+package = ABC Corp.
+version = 1.1
+core = 7.x

@@ -1,0 +1,113 @@
+<?php
+// $Id: $
+
+/**
+ * Implementation of hook_menu
+ */
+
+function phone_survey_menu() {
+  $items = array ();
+  $items ['phonesurvey'] = array (
+    'title' => t('Phone Survey'),
+    'page callback' => 'phone_survey_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_SUGGESTED_ITEM,    
+  );
+
+  //if you forget this-- the hook won't create the menu item
+  return $items;
+}
+
+/**
+ * page callback created in the Implementation of hook_menu
+ * page will be called by the path http://localhost/site/?q=phonesurvey
+ * drupal_get_form() documentation @ http://api.drupal.org/api/function/drupal_get_form/6
+ *
+ *
+ */
+function phone_survey_page() {
+  return drupal_get_form('phone_survey_form');
+}
+
+
+
+/**
+ * Define the form
+ *
+ */
+function phone_survey_form() {
+
+  //make a texfield
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Please enter your name'),
+    '#required' => TRUE,
+  );
+  
+  // create three "radio buttons"
+  $form ['phone_type'] =array(
+    '#type' => 'radios',
+    '#title' => t('What kind of phone do you have?'),
+    '#options' => array(
+	              'Flip' => t('Flip'), 
+	              'Touchscreen' => t('Touchscreen'), 
+	              'Unsure' => t('Unsure'),
+	               ),
+    '#required' => TRUE,
+  );
+
+   // create a fieldset
+ $form['set1'] = array( 
+    '#title' => t('Manufacturer'), 
+    '#type' => 'fieldset', 
+    '#description' => t('Who is the manufacturer of your Tounchscreen phone?'),
+	'#states' => array(
+			'visible' => array ( //action to take.
+				':input[name=phone_type]' => array('value' => 'Touchscreen'),
+			),
+	),
+   );
+ 
+   $form['set1']['manufacturer'] = array(
+      '#type' => 'select', 
+      '#title' => t('Brand'), 
+      '#options' => array(
+					'google' => t('Google'),
+					'htc' => t('HTC'),
+					'sony' => t('Sony'),
+					),
+   );
+
+  //a "submit" button
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('submit'),  
+  );
+    return $form;
+}
+
+/**
+ * form_submit function, once the form passes the validation
+ */
+function phone_survey_form_submit($form, &$form_state) {
+  $name = $form_state['values']['name'];
+  $phone_type = $form_state['values']['phone_type'];
+  // @name and @phone_type are a placeholders that will call 
+  // check_plain() on the strings
+
+  $output = t('Hi @name, your survey response was submitted successfully.', array('@name' => $name));
+  $output .= '<br>';
+  $output .= t('You have a @phone_type phone', array('@phone_type' => $phone_type));
+  
+  drupal_set_message($output);
+}
+
+/**
+ * Validation function, users unsure about their phone type cannot submit the form
+ *
+ */
+function phone_survey_form_validate($form, &$form_state) {
+  if ($form_state['values']['phone_type'] == 'Unsure') {
+    form_set_error('phone_type', t('We can\'t believe you don\'t know what type of phone you have.'));
+  }
+}
